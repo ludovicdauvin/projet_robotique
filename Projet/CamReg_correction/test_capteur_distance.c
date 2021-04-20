@@ -31,35 +31,39 @@ static THD_FUNCTION(TestDistance, arg) {
     messagebus_topic_t *prox_topic = messagebus_find_topic_blocking(&bus, "/proximity");
       proximity_msg_t prox_values;
 
-    int luminosite=0;
-
-//    while(1){
-//        time = chVTGetSystemTime();
-//
-//        luminosite = get_prox(0);
-//
-//        if(luminosite<get_ambient_light(0)){
-//
-//        set_body_led(TRUE); // value (0=off 1=on higher=inverse)
-//        }else{
-//        	 set_body_led(FALSE); // value (0=off 1=on higher=inverse)
-//        }
-//        //100Hz
-//        chThdSleepUntilWindowed(time, time + MS2ST(10));
-//    }
+//    int luminosite=0;
+    int marge = 500; // déterminer avec les valeurs lue sur le terminal
 
     while(1){
-    	 time = chVTGetSystemTime();
-    	 messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
-    for (uint8_t i = 0; i < sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++) {
-  		        //for (uint8_t i = 0; i < PROXIMITY_NB_CHANNELS; i++) {
-  		        	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[i]);
-  		        	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[i]);
-  		        	chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[i]);
-  		        	chprintf((BaseSequentialStream *)&SDU1, "\r\n");
-  		        }
-    chThdSleepUntilWindowed(time, time + MS2ST(10));
-}
+        time = chVTGetSystemTime();
+        messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
+//        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[0]);
+//        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[0]);
+//        chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[0]);
+//        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
+
+        if( prox_values.reflected[0] + marge < prox_values.ambient[0]){
+
+        set_body_led(TRUE); // value (0=off 1=on higher=inverse)
+        }else{
+        	 set_body_led(FALSE); // value (0=off 1=on higher=inverse)
+        }
+        //100Hz
+        chThdSleepUntilWindowed(time, time + MS2ST(10));
+    }
+
+//    while(1){
+//    	 time = chVTGetSystemTime();
+//    	 messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
+//    for (uint8_t i = 0; i < sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++) {
+//  		        //for (uint8_t i = 0; i < PROXIMITY_NB_CHANNELS; i++) {
+//  		        	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[i]);
+//  		        	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[i]);
+//  		        	chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[i]);
+//  		        	chprintf((BaseSequentialStream *)&SDU1, "\r\n");
+//  		        }
+//    chThdSleepUntilWindowed(time, time + MS2ST(10));
+//    }
 }
 void test_distance_start(void){
 	chThdCreateStatic(waTestDistance, sizeof(waTestDistance), NORMALPRIO, TestDistance, NULL);
