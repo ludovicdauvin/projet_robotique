@@ -16,7 +16,8 @@
 //#include <process_image.h>
 
 //nos includes ajouté
-#include <test_capteur_distance.h>
+#include <capteur_distance.h>
+//#include <test_capteur_distance.h>
 #include <leds.h>
 #include <sensors/proximity.h>
 
@@ -75,8 +76,9 @@ int main(void)
 //	pi_regulator_start();
 //	process_image_start();
 
-    //test capteur distance
-    test_distance_start();
+    //capteur distance
+    capteur_distance_start();
+//    test_distance_start();
     /* Infinite loop. */
     while (1) {
 

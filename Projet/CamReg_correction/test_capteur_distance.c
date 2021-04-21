@@ -37,16 +37,17 @@ static THD_FUNCTION(TestDistance, arg) {
     while(1){
         time = chVTGetSystemTime();
         messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
-//        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[0]);
-//        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[0]);
-//        chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[0]);
-//        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
+        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[0]);
+        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[0]);
+        chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[0]);
+        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
 
         if( prox_values.reflected[0] + marge < prox_values.ambient[0]){
-
-        set_body_led(TRUE); // value (0=off 1=on higher=inverse)
+//        	 set_body_led(TRUE);
+        set_rgb_led(0, 10, 0 ,0); // value (0=off 1=on higher=inverse)
         }else{
-        	 set_body_led(FALSE); // value (0=off 1=on higher=inverse)
+//        	 set_body_led(FALSE);
+        	 set_rgb_led(LED2, 0, 0 ,0); // value (0=off 1=on higher=inverse)
         }
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
