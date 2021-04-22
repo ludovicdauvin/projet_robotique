@@ -1,6 +1,6 @@
 build
 
-DS-store
+*.DS_Store
 
 /lib
 
