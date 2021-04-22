@@ -19,6 +19,8 @@
 #include <leds.h>
 #include <sensors/proximity.h>
 
+NB_CAPTEUR= 8;
+
 static THD_WORKING_AREA(waCapteurDistance, 512);
 static THD_FUNCTION(CapteurDistance, arg) {
 
@@ -48,7 +50,7 @@ static THD_FUNCTION(CapteurDistance, arg) {
         clear_leds();
 
 //        for(uint8_t i=0; i< sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++){
-        for(uint8_t i=0; i< 8; i++){
+        for(uint8_t i=0; i< NB_CAPTEUR; i++){
         	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) && (prox_values.delta[i]>=prox_values.delta[num_proche])){
         		 num_proche = i;
         		 valeur_capt_proche = prox_values.reflected[i];
