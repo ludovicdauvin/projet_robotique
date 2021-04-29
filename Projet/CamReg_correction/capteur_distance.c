@@ -50,7 +50,7 @@ static THD_FUNCTION(CapteurDistance, arg) {
         num_proche = VALEUR_REF;
         int marge_detection = 500; //échelle du capteur de 0 à 4000
         valeur_capt_proche = VALEUR_REF;
-        clear_leds();
+
 
 //        for(uint8_t i=0; i< sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++){
         for(uint8_t i=0; i< NB_CAPTEUR; i++){

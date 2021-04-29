@@ -31,6 +31,8 @@ static THD_FUNCTION(ControleDistLeds, arg) {
           time = chVTGetSystemTime();
           uint8_t num_proche = get_capteur_proche();
 
+          clear_leds();
+
 		 if (num_proche==0 && get_val_capteur_proche() != 0){
 					set_led(LED1,TRUE); // value (0=off 1=on higher=inverse)
 				}else if(num_proche==1){
