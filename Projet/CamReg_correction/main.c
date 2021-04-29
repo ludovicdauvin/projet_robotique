@@ -17,6 +17,7 @@
 
 //nos includes ajouté
 #include <capteur_distance.h>
+#include <controle_avec_leds.h>
 //#include <test_capteur_distance.h>
 #include <leds.h>
 #include <sensors/proximity.h>
@@ -78,6 +79,7 @@ int main(void)
 
     //capteur distance
     capteur_distance_start();
+    controle_distance_leds_start();
 //    test_distance_start();
     /* Infinite loop. */
     while (1) {

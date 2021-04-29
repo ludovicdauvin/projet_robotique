@@ -13,6 +13,7 @@ CSRC += ./main.c \
 		./pi_regulator.c \
 		./process_image.c \
 		./capteur_distance.c \
+		./controle_avec_leds.c \
 
 #Header folders to include
 INCDIR += 

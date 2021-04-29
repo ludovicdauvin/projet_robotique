@@ -19,9 +19,12 @@
 #include <leds.h>
 #include <sensors/proximity.h>
 
-NB_CAPTEUR= 8;
+uint8_t NB_CAPTEUR= 8;
+uint8_t VALEUR_REF = 0;
+uint8_t num_proche = 0;
+unsigned int valeur_capt_proche = 0;
 
-static THD_WORKING_AREA(waCapteurDistance, 512);
+static THD_WORKING_AREA(waCapteurDistance, 256);
 static THD_FUNCTION(CapteurDistance, arg) {
 
     chRegSetThreadName(__FUNCTION__);
@@ -44,9 +47,9 @@ static THD_FUNCTION(CapteurDistance, arg) {
 //        chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[0]);
 //        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
 
-        uint8_t num_proche = 0;
+        num_proche = VALEUR_REF;
         int marge_detection = 500; //échelle du capteur de 0 à 4000
-        unsigned int valeur_capt_proche = 0;
+        valeur_capt_proche = VALEUR_REF;
         clear_leds();
 
 //        for(uint8_t i=0; i< sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++){
@@ -67,27 +70,27 @@ static THD_FUNCTION(CapteurDistance, arg) {
 //        	 }
 
         }
-        if (num_proche==0 && valeur_capt_proche != 0){
-        	set_led(LED1,TRUE); // value (0=off 1=on higher=inverse)
-       	}else if(num_proche==1){
-            set_led(LED3,TRUE);
-            set_led(LED1,TRUE);// value (0=off 1=on higher=inverse)
-        }else if(num_proche==2){
-            set_led(LED3,TRUE);// value (0=off 1=on higher=inverse)
-        }else if(num_proche==3){
-            set_led(LED5,TRUE);
-            set_led(LED3,TRUE);// value (0=off 1=on higher=inverse)
-        }else if(num_proche==4){
-            set_led(LED5,TRUE);
-            set_led(LED7,TRUE);
-        }else if(num_proche==5){
-            set_led(LED7,TRUE);
-        }else if(num_proche==6){
-            set_led(LED1,TRUE);
-            set_led(LED7,TRUE);
-        }else if(num_proche==7){
-            set_led(LED1,TRUE);
-        }
+//        if (num_proche==0 && valeur_capt_proche != 0){
+//        	set_led(LED1,TRUE); // value (0=off 1=on higher=inverse)
+//       	}else if(num_proche==1){
+//            set_led(LED3,TRUE);
+//            set_led(LED1,TRUE);// value (0=off 1=on higher=inverse)
+//        }else if(num_proche==2){
+//            set_led(LED3,TRUE);// value (0=off 1=on higher=inverse)
+//        }else if(num_proche==3){
+//            set_led(LED5,TRUE);
+//            set_led(LED3,TRUE);// value (0=off 1=on higher=inverse)
+//        }else if(num_proche==4){
+//            set_led(LED5,TRUE);
+//            set_led(LED7,TRUE);
+//        }else if(num_proche==5){
+//            set_led(LED7,TRUE);
+//        }else if(num_proche==6){
+//            set_led(LED1,TRUE);
+//            set_led(LED7,TRUE);
+//        }else if(num_proche==7){
+//            set_led(LED1,TRUE);
+//        }
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
@@ -96,6 +99,14 @@ static THD_FUNCTION(CapteurDistance, arg) {
 }
 void capteur_distance_start(void){
 	chThdCreateStatic(waCapteurDistance, sizeof(waCapteurDistance), NORMALPRIO, CapteurDistance, NULL);
+}
+
+uint8_t get_capteur_proche(void){
+	return num_proche;
+}
+
+unsigned int get_val_capteur_proche(void){
+	return valeur_capt_proche;
 }
 
 
