@@ -8,19 +8,21 @@
 #include "memory_protection.h"
 #include <usbcfg.h>
 #include <main.h>
-//#include <motors.h>
+#include <motors.h>
 //#include <camera/po8030.h>
 #include <chprintf.h>
 
-//#include <pi_regulator.h>
+#include <pi_regulator.h>
 //#include <process_image.h>
 
 //nos includes ajouté
 #include <capteur_distance.h>
 #include <controle_avec_leds.h>
+#include <test_gravite.h>
 //#include <test_capteur_distance.h>
 #include <leds.h>
 #include <sensors/proximity.h>
+#include <sensors/imu.h>
 
 
 messagebus_t bus;
@@ -61,9 +63,10 @@ int main(void)
     //start the USB communication
     usb_start();
 
-    //starts the proximity sensors
+    //starts sensors
     proximity_start();
-    //calibrate proximity sensors
+    imu_start();
+
 
 
 
@@ -71,15 +74,16 @@ int main(void)
 //    dcmi_start();
 //	po8030_start();
 //	//inits the motors
-//	motors_init();
+	motors_init();
 
 	//stars the threads for the pi regulator and the processing of the image
-//	pi_regulator_start();
+	pi_regulator_start();
 //	process_image_start();
 
     //capteur distance
     capteur_distance_start();
     controle_distance_leds_start();
+    test_gravite_start();
 //    test_distance_start();
     /* Infinite loop. */
     while (1) {

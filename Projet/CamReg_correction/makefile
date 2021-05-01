@@ -14,6 +14,7 @@ CSRC += ./main.c \
 		./process_image.c \
 		./capteur_distance.c \
 		./controle_avec_leds.c \
+		./test_gravite.c \
 
 #Header folders to include
 INCDIR += 
