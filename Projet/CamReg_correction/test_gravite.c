@@ -19,7 +19,8 @@
 #include <leds.h>
 #include <sensors/imu.h>
 
-float threshold = 1;
+
+float threshold = 1.5;
 float angle = 0;
 float inclinaison = 0;
 
@@ -31,11 +32,11 @@ static THD_FUNCTION(TestGravite, arg) {
 
     systime_t time;
 
-    calibrate_acc();
 
     messagebus_topic_t *imu_topic = messagebus_find_topic_blocking(&bus, "/imu");
     imu_msg_t imu_values;
 
+    calibrate_acc();
 
 
     while(1){
@@ -46,25 +47,31 @@ static THD_FUNCTION(TestGravite, arg) {
         if(fabs(imu_values.acceleration[X_AXIS]) > threshold || fabs(imu_values.acceleration[Y_AXIS]) > threshold){
         	angle = atan2(imu_values.acceleration[X_AXIS], imu_values.acceleration[Y_AXIS]);
 
-        	angle += M_PI;
+//        	angle += M_PI;
 
-        if(angle > M_PI){
-                    angle = -2 * M_PI + angle;
-        }
-        if(angle >= 0 && angle < M_PI/2){
-            set_led(LED1,TRUE);
-        }else if(angle >= M_PI/2 && angle < M_PI){
-           	set_led(LED3,TRUE);
-        }else if(angle >= -M_PI && angle < -M_PI/2){
-           	set_led(LED5,TRUE);
-        }else if(angle >= -M_PI/2 && angle < 0){
-           	set_led(LED7,TRUE);
-        }
+//        if(angle > M_PI){
+//                    angle = -2 * M_PI + angle;
+//        }
+//        if(angle >= 0 && angle < M_PI/2){
+//            set_led(LED1,TRUE);
+//        }else if(angle >= M_PI/2 && angle < M_PI){
+//           	set_led(LED3,TRUE);
+//        }else if(angle >= -M_PI && angle < -M_PI/2){
+//           	set_led(LED5,TRUE);
+//        }else if(angle >= -M_PI/2 && angle < 0){
+//           	set_led(LED7,TRUE);
+//        }
+        if (imu_values.acceleration[Y_AXIS] <= 0){
+                	inclinaison = imu_values.acceleration[Z_AXIS]+ get_acc_offset(Z_AXIS);
+                }else{
+                	inclinaison = -imu_values.acceleration[Z_AXIS]- get_acc_offset(Z_AXIS);
+                }
         }else{
         	angle = 0;
+        	inclinaison = 0;
         }
 
-       inclinaison = imu_values.acceleration[Z_AXIS];
+
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
