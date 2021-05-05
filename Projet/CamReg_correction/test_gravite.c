@@ -19,9 +19,9 @@
 #include <leds.h>
 #include <sensors/imu.h>
 
-
+float CONVERSION_RAD_DEG = 180/M_PI;
 float threshold = 1.5;
-float angle = 0;
+int angle = 0;
 float inclinaison = 0;
 
 static THD_WORKING_AREA(waTestGravite, 256);
@@ -43,15 +43,16 @@ static THD_FUNCTION(TestGravite, arg) {
         time = chVTGetSystemTime();
 
         messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
+//        int angle_test = 0;
 
         if(fabs(imu_values.acceleration[X_AXIS]) > threshold || fabs(imu_values.acceleration[Y_AXIS]) > threshold){
-        	angle = atan2(imu_values.acceleration[X_AXIS], imu_values.acceleration[Y_AXIS]);
+        	angle = atan2(imu_values.acceleration[X_AXIS], imu_values.acceleration[Y_AXIS])*CONVERSION_RAD_DEG;
 
 //        	angle += M_PI;
 
-//        if(angle > M_PI){
-//                    angle = -2 * M_PI + angle;
-//        }
+        if(angle > M_PI*CONVERSION_RAD_DEG){
+                    angle = -2 * M_PI*CONVERSION_RAD_DEG + angle;
+        }
 //        if(angle >= 0 && angle < M_PI/2){
 //            set_led(LED1,TRUE);
 //        }else if(angle >= M_PI/2 && angle < M_PI){
@@ -70,11 +71,11 @@ static THD_FUNCTION(TestGravite, arg) {
         	angle = 0;
         	inclinaison = 0;
         }
-
+//        angle_test = angle;
 
 
         //100Hz
-        chThdSleepUntilWindowed(time, time + MS2ST(10));
+        chThdSleepUntilWindowed(time, time + MS2ST(50));
     }
 
 }
@@ -82,7 +83,7 @@ void test_gravite_start(void){
 	chThdCreateStatic(waTestGravite, sizeof(waTestGravite), NORMALPRIO, TestGravite, NULL);
 }
 
-float get_angle(void){
+int get_angle(void){
 	return angle;
 }
 

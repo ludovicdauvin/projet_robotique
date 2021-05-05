@@ -9,7 +9,7 @@
 #define TEST_GRAVITE_H_
 
 void test_gravite_start(void);
-float get_angle(void);
+int get_angle(void);
 float get_inclinaison(void);
 
 
