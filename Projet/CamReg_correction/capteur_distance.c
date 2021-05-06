@@ -48,7 +48,7 @@ static THD_FUNCTION(CapteurDistance, arg) {
 //        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
 
         num_proche = VALEUR_REF;
-        int marge_detection = 500; //échelle du capteur de 0 à 4000
+        int marge_detection = 500; //échelle du capteur de 0 à 4000, 0 est quand le mur touche le capteur.
         valeur_capt_proche = VALEUR_REF;
 
 

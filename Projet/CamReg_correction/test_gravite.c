@@ -23,6 +23,7 @@ float CONVERSION_RAD_DEG = 180/M_PI;
 float threshold = 1.5;
 int angle = 0;
 float inclinaison = 0;
+float GRAVITE = 9.81;
 
 static THD_WORKING_AREA(waTestGravite, 256);
 static THD_FUNCTION(TestGravite, arg) {
@@ -44,6 +45,7 @@ static THD_FUNCTION(TestGravite, arg) {
 
         messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
 //        int angle_test = 0;
+        int inclinaison_test = 0;
 
         if(fabs(imu_values.acceleration[X_AXIS]) > threshold || fabs(imu_values.acceleration[Y_AXIS]) > threshold){
         	angle = atan2(imu_values.acceleration[X_AXIS], imu_values.acceleration[Y_AXIS])*CONVERSION_RAD_DEG;
@@ -62,15 +64,16 @@ static THD_FUNCTION(TestGravite, arg) {
 //        }else if(angle >= -M_PI/2 && angle < 0){
 //           	set_led(LED7,TRUE);
 //        }
-        if (imu_values.acceleration[Y_AXIS] <= 0){
-                	inclinaison = imu_values.acceleration[Z_AXIS]+ get_acc_offset(Z_AXIS);
+        if (imu_values.acceleration[Y_AXIS] <= 0){// valeur de la projection du vecteur de gravité sur l'axe z, varie de environ-9.80(robot plat) à -6.5 pour un angle de 45 degrées avec l'horizonatale
+                	inclinaison = imu_values.acceleration[Z_AXIS]+GRAVITE;
                 }else{
-                	inclinaison = -imu_values.acceleration[Z_AXIS]- get_acc_offset(Z_AXIS);
+                	inclinaison = -imu_values.acceleration[Z_AXIS]-GRAVITE;
                 }
         }else{
         	angle = 0;
         	inclinaison = 0;
         }
+        inclinaison_test = inclinaison;
 //        angle_test = angle;
 
 

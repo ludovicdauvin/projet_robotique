@@ -51,6 +51,7 @@ int FACTOR_ROTATION = 200;
 int ANGLE_FIN_ROTATION = 5;
 int ANGLE_FIN_DROIT = 20;
 float LIMITE_INCLINAISON = 0.5;
+int SPEED_MIN = 150;
 
 enum capteurs_ir {ir1, ir2,ir3,ir4,ir5,ir6,ir7,ir8};
 
@@ -131,11 +132,11 @@ static THD_FUNCTION(PiRegulator, arg) {
         }else{
         	 if(fabs(get_angle()) >= ANGLE_FIN_ROTATION && tout_droit == 0){
 					if(angle>0){
-						right_motor_set_speed(- MOTOR_SPEED_LIMIT/2);
-						left_motor_set_speed(+ MOTOR_SPEED_LIMIT/2);
+						right_motor_set_speed(- fabs(MOTOR_SPEED_LIMIT *angle/180)-SPEED_MIN);
+						left_motor_set_speed(+ fabs(MOTOR_SPEED_LIMIT *angle/180)+SPEED_MIN);
 					}else if (angle<0){
-						right_motor_set_speed( MOTOR_SPEED_LIMIT/2);
-						left_motor_set_speed(- MOTOR_SPEED_LIMIT/2);
+						right_motor_set_speed( fabs(MOTOR_SPEED_LIMIT *angle/180)+SPEED_MIN);
+						left_motor_set_speed(- fabs(MOTOR_SPEED_LIMIT *angle/180)-SPEED_MIN);
 					}
 //					if(angle > M_PI){
 //										angle = -2 * M_PI + angle;
