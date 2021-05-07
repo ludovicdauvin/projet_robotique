@@ -9,7 +9,7 @@
 #include <main.h>
 #include <motors.h>
 #include <pi_regulator.h>
-#include <test_gravite.h>
+#include <gyro_angles.h>
 #include <capteur_distance.h>
 #include <leds.h>
 //#include <process_image.h>
@@ -50,7 +50,7 @@ int FACTOR_STRAIGHT = 400;
 int FACTOR_ROTATION = 200;
 int ANGLE_FIN_ROTATION = 5;
 int ANGLE_FIN_DROIT = 20;
-float LIMITE_INCLINAISON = 0.2;
+int LIMITE_INCLINAISON = 5;
 int SPEED_MIN = 150;
 uint8_t LE_PLUS_PROCHE = 0;
 uint8_t LE_2ND_PLUS_PROCHE = 1;
@@ -84,14 +84,9 @@ static THD_FUNCTION(PiRegulator, arg) {
     while(1){
         time = chVTGetSystemTime();
         
-        int angle = get_angle();
+        int angle = get_angle_dir();
 
         uint16_t valeur_proche = get_val_capteur_proche(LE_PLUS_PROCHE);
-//        float inclinaison = get_inclinaison();
-//        inclinaison = get_inclinaison();
-
-        speed_straight = get_inclinaison()*FACTOR_STRAIGHT; // mettre limite pour éviter le dépassement de capacité du int
-
         direction = direction_haut(angle)*FACTOR_ROTATION;
 
 
@@ -99,7 +94,9 @@ static THD_FUNCTION(PiRegulator, arg) {
 
         enum capteurs_ir capteur_proche = get_capteur_proche(LE_PLUS_PROCHE);
 
-        if ((capteur_proche == ir1||capteur_proche == ir2||capteur_proche == ir8||capteur_proche == ir7) && valeur_proche > 3100) { // marge mise pour s'assurer que le capteur 3 ou 6 détecte pendant la rotation
+        if((((capteur_proche == ir1 && valeur_proche!=0)||capteur_proche == ir2||capteur_proche == ir3) && angle > 0) || ((capteur_proche == ir6||capteur_proche == ir7||capteur_proche == ir8) && angle <= 0)){
+
+        if ((capteur_proche == ir1||capteur_proche == ir2||capteur_proche == ir8||capteur_proche == ir7) && valeur_proche > 3100){ // marge mise pour s'assurer que le capteur 3 ou 6 détecte pendant la rotation
         	capteur_proche = ir1;
         	valeur_proche = 0;
         }
@@ -171,65 +168,11 @@ static THD_FUNCTION(PiRegulator, arg) {
         		right_motor_set_speed(-MOTOR_SPEED_LIMIT/2);
         		left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
         	}
-//			switch (capteur_proche){
-//				case ir1: case ir2:
-//					right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-//					left_motor_set_speed(-MOTOR_SPEED_LIMIT/4);
-//				  // statements
-//				 break;
-//
-//				case ir7: case ir8:
-//					right_motor_set_speed(-MOTOR_SPEED_LIMIT/4);
-//					left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-//
-//				  // statements
-//				 break;
-//
-//				case ir3:
-////					if(get_val_capteur_proche(LE_PLUS_PROCHE) > VAL_LIM_MUR){
-////
-////					}else if(valeur_proche_memoire > get_val_capteur_proche(LE_PLUS_PROCHE)){
-////						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-////						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-////					}
-////					if(get_val_capteur_proche(LE_PLUS_PROCHE) < 2500 ){ // mettre une limite à finir projet de suivre en zig zag entre deux valeurs de seuil.
-////						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-////						left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-////					}else if(get_val_capteur_proche(LE_PLUS_PROCHE) > 2700){
-////						right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-////						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-////					}else{
-////						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-////						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-////					}
-//					if(get_val_capteur_proche(LE_PLUS_PROCHE) < 2500 ){ // mettre une limite quand elle est passée, le robot va tout droit
-//						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-//						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-//					}else{
-//						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-//						left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-//					}
-//
-////
-//				break;
-//
-//				 case ir6:
-//					if(get_val_capteur_proche(0) < 2500){ // mettre une limite
-//						right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-//						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-//					}else{
-//						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-//						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-//					}
-//				break;
-//
-//				 default:
-//					right_motor_set_speed(0);
-//					left_motor_set_speed(0);
-//
-//			}
+
+        }
+
         }else{
-        	 if(fabs(get_angle()) >= ANGLE_FIN_ROTATION && tout_droit == 0){
+        	 if(fabs(angle) >= ANGLE_FIN_ROTATION && tout_droit == 0){
 					if(angle>0){
 						right_motor_set_speed(- fabs(MOTOR_SPEED_LIMIT *angle/180)-SPEED_MIN);
 						left_motor_set_speed(+ fabs(MOTOR_SPEED_LIMIT *angle/180)+SPEED_MIN);
@@ -237,34 +180,19 @@ static THD_FUNCTION(PiRegulator, arg) {
 						right_motor_set_speed( fabs(MOTOR_SPEED_LIMIT *angle/180)+SPEED_MIN);
 						left_motor_set_speed(- fabs(MOTOR_SPEED_LIMIT *angle/180)-SPEED_MIN);
 					}
-//					if(angle > M_PI){
-//										angle = -2 * M_PI + angle;
-//							}
-//							if(angle >= 0 && angle < M_PI/2){
-//								set_led(LED1,TRUE);
-//							}else if(angle >= M_PI/2 && angle < M_PI){
-//								set_led(LED3,TRUE);
-//							}else if(angle >= -M_PI && angle < -M_PI/2){
-//								set_led(LED5,TRUE);
-//							}else if(angle >= -M_PI/2 && angle < 0){
-//								set_led(LED7,TRUE);
-//							}
-			   }else if(get_inclinaison() > LIMITE_INCLINAISON){
+
+			   }else if(get_angle_inc() > LIMITE_INCLINAISON){
 				   tout_droit = TRUE;
-	//				right_motor_set_speed(speed_straight);  // pas possible car le robot glisse
-	//				left_motor_set_speed(speed_straight);
+
 				   right_motor_set_speed(MOTOR_SPEED_LIMIT);
 				   left_motor_set_speed( MOTOR_SPEED_LIMIT);
 
-				   if(fabs(get_angle()) >= ANGLE_FIN_DROIT) tout_droit = FALSE;
+				   if(fabs(get_angle_dir()) >= ANGLE_FIN_DROIT) tout_droit = FALSE;
 			   }else {
 					right_motor_set_speed(0);
 					left_motor_set_speed(0);
 			   }
 		}
-
-
-
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
     }

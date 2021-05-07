@@ -11,10 +11,9 @@ GLOBAL_PATH = ../../lib/e-puck2_main-processor
 #Source files to include
 CSRC += ./main.c \
 		./pi_regulator.c \
-		./process_image.c \
 		./capteur_distance.c \
 		./controle_avec_leds.c \
-		./test_gravite.c \
+		./gyro_angles.c \
 
 #Header folders to include
 INCDIR += 

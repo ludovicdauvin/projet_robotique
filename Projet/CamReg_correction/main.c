@@ -9,17 +9,15 @@
 #include <usbcfg.h>
 #include <main.h>
 #include <motors.h>
-//#include <camera/po8030.h>
 #include <chprintf.h>
 
 #include <pi_regulator.h>
-//#include <process_image.h>
+
 
 //nos includes ajouté
 #include <capteur_distance.h>
 #include <controle_avec_leds.h>
-#include <test_gravite.h>
-//#include <test_capteur_distance.h>
+#include <gyro_angles.h>
 #include <leds.h>
 #include <sensors/proximity.h>
 #include <sensors/imu.h>
@@ -83,7 +81,7 @@ int main(void)
     //capteur distance
     capteur_distance_start();
     controle_distance_leds_start();
-    test_gravite_start();
+    gravite_start();
 //    test_distance_start();
     /* Infinite loop. */
     while (1) {
