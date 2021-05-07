@@ -49,11 +49,11 @@ void imu_compute_offset(messagebus_topic_t * imu_topic, uint16_t nb_samples){
  // }
 
   */
-
+float conversion = 180/M_PI;
 //static int16_t x = get_gyro_filtered(X_AXIS, FILTERSIZE);
 //static int16_t y = get_gyro_filtered(Y_AXIS, FILTERSIZE);
-float get_angle_gyro(float x,float z){
-	float angle = acos(x/z);
+int get_angle_acc(float x,float z){
+	int angle = acos(x/z)*conversion;
 	// angle += ADAPTATION_ROBOT;
 	 return angle;
  }
@@ -91,10 +91,10 @@ static THD_FUNCTION(imu_reader_thd, arg) {
 
     	 	 messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
     	 	chprintf((BaseSequentialStream *)&SDU1, "IMU\r\n");
-    	 	    chprintf((BaseSequentialStream *)&SDU1, "%Ax=%f Ay=%f Az=%f angle=%f \r\n\n", imu_values.acceleration[X_AXIS], imu_values.acceleration[Y_AXIS], imu_values.acceleration[Z_AXIS], get_angle_gyro(imu_values.acceleration[X_AXIS], imu_values.acceleration[Z_AXIS]));
+    	 	    chprintf((BaseSequentialStream *)&SDU1, "%Ax=%f Ay=%f Az=%f angle=%f \r\n\n", imu_values.acceleration[X_AXIS], imu_values.acceleration[Y_AXIS], imu_values.acceleration[Z_AXIS], get_angle_acc(imu_values.acceleration[X_AXIS], imu_values.acceleration[Z_AXIS]));
     	 	int16_t x = get_acc_filtered(X_AXIS, FILTERSIZE);
     	    int16_t z = get_acc_filtered(Z_AXIS, FILTERSIZE);
-    	     get_angle_gyro(x,z);
+    	     get_angle_acc(x,z);
         	chThdSleepMilliseconds(1000);
     	 		}
 	}
