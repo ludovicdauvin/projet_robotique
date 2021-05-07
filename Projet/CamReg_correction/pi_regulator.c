@@ -50,8 +50,10 @@ int FACTOR_STRAIGHT = 400;
 int FACTOR_ROTATION = 200;
 int ANGLE_FIN_ROTATION = 5;
 int ANGLE_FIN_DROIT = 20;
-float LIMITE_INCLINAISON = 0.5;
+float LIMITE_INCLINAISON = 0.2;
 int SPEED_MIN = 150;
+uint8_t LE_PLUS_PROCHE = 0;
+uint8_t LE_2ND_PLUS_PROCHE = 1;
 
 enum capteurs_ir {ir1, ir2,ir3,ir4,ir5,ir6,ir7,ir8};
 
@@ -75,60 +77,157 @@ static THD_FUNCTION(PiRegulator, arg) {
     int speed_straight=0;
     int direction = 0;
     bool tout_droit = FALSE;
+    static bool rotation_mur = FALSE;
+    uint16_t valeur_proche_memoire = 0;
 
 
     while(1){
         time = chVTGetSystemTime();
         
         int angle = get_angle();
+
+        uint16_t valeur_proche = get_val_capteur_proche(LE_PLUS_PROCHE);
+//        float inclinaison = get_inclinaison();
+//        inclinaison = get_inclinaison();
+
         speed_straight = get_inclinaison()*FACTOR_STRAIGHT; // mettre limite pour éviter le dépassement de capacité du int
 
         direction = direction_haut(angle)*FACTOR_ROTATION;
 
 
 
-        enum capteurs_ir capteur_proche = get_capteur_proche();
 
-        if(get_val_capteur_proche() != 0){
-			switch (capteur_proche){
+        enum capteurs_ir capteur_proche = get_capteur_proche(LE_PLUS_PROCHE);
+
+        if ((capteur_proche == ir1||capteur_proche == ir2||capteur_proche == ir8||capteur_proche == ir7) && valeur_proche > 3100) { // marge mise pour s'assurer que le capteur 3 ou 6 détecte pendant la rotation
+        	capteur_proche = ir1;
+        	valeur_proche = 0;
+        }
+
+        if(valeur_proche != 0 || rotation_mur){
+        	switch (capteur_proche){
 				case ir1: case ir2:
-					right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-					left_motor_set_speed(-MOTOR_SPEED_LIMIT/4);
-				  // statements
-				 break;
+					rotation_mur = TRUE;
+				break;
 
 				case ir7: case ir8:
-					right_motor_set_speed(-MOTOR_SPEED_LIMIT/4);
-					left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-
-				  // statements
-				 break;
+					rotation_mur = TRUE;
+				break;
 
 				case ir3:
-					if(get_val_capteur_proche() < 2500){ // mettre une limite
-						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-						left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+
+					if(get_val_capteur_proche(LE_PLUS_PROCHE)>valeur_proche_memoire && valeur_proche_memoire != 0){
+						rotation_mur = FALSE;
+						valeur_proche_memoire = 0; // valeur plus grand que le max
 					}else{
-						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+						valeur_proche_memoire = get_val_capteur_proche(LE_PLUS_PROCHE);
+					}
+					if (rotation_mur == FALSE){
+						if(get_val_capteur_proche(LE_PLUS_PROCHE) < 2800 ){ // mettre une limite à finir projet de suivre en zig zag entre deux valeurs de seuil.
+							right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+							left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+						}else if(get_val_capteur_proche(LE_PLUS_PROCHE) > 3000){
+							right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+							left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+						}else{
+							right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+							left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+						}
+					}
+
+				break;
+
+				case ir6:
+					if(get_val_capteur_proche(LE_PLUS_PROCHE)>valeur_proche_memoire && valeur_proche_memoire != 0){// vu qu on ne touche jamais le mur, la variable 0 n'est pas possible en fonctionnement normal
+						rotation_mur = FALSE;
+						valeur_proche_memoire = 0;
+					}else{
+						valeur_proche_memoire = get_val_capteur_proche(LE_PLUS_PROCHE);
+					}
+					if (rotation_mur == FALSE){
+						if(get_val_capteur_proche(LE_PLUS_PROCHE) < 2800 ){ // mettre une limite à finir projet de suivre en zig zag entre deux valeurs de seuil.
+							right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+							left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+						}else if(get_val_capteur_proche(LE_PLUS_PROCHE) > 3000){
+							right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+							left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+						}else{
+							right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+							left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+						}
 					}
 				break;
 
-				 case ir6:
-					if(get_val_capteur_proche() < 2500){ // mettre une limite
-						right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
-						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-					}else{
-						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
-					}
-				break;
-
-				 default:
+				default:
 					right_motor_set_speed(0);
 					left_motor_set_speed(0);
 
 			}
+        	if(rotation_mur && (capteur_proche == ir1 || capteur_proche == ir2 ||capteur_proche == ir3) && valeur_proche !=0){
+        		right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+        		left_motor_set_speed(-MOTOR_SPEED_LIMIT/2);
+        	}
+        	if(rotation_mur && (capteur_proche == ir8 || capteur_proche == ir7 ||capteur_proche == ir6)){
+        		right_motor_set_speed(-MOTOR_SPEED_LIMIT/2);
+        		left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+        	}
+//			switch (capteur_proche){
+//				case ir1: case ir2:
+//					right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+//					left_motor_set_speed(-MOTOR_SPEED_LIMIT/4);
+//				  // statements
+//				 break;
+//
+//				case ir7: case ir8:
+//					right_motor_set_speed(-MOTOR_SPEED_LIMIT/4);
+//					left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+//
+//				  // statements
+//				 break;
+//
+//				case ir3:
+////					if(get_val_capteur_proche(LE_PLUS_PROCHE) > VAL_LIM_MUR){
+////
+////					}else if(valeur_proche_memoire > get_val_capteur_proche(LE_PLUS_PROCHE)){
+////						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+////						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+////					}
+////					if(get_val_capteur_proche(LE_PLUS_PROCHE) < 2500 ){ // mettre une limite à finir projet de suivre en zig zag entre deux valeurs de seuil.
+////						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+////						left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+////					}else if(get_val_capteur_proche(LE_PLUS_PROCHE) > 2700){
+////						right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+////						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+////					}else{
+////						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+////						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+////					}
+//					if(get_val_capteur_proche(LE_PLUS_PROCHE) < 2500 ){ // mettre une limite quand elle est passée, le robot va tout droit
+//						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+//						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+//					}else{
+//						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+//						left_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+//					}
+//
+////
+//				break;
+//
+//				 case ir6:
+//					if(get_val_capteur_proche(0) < 2500){ // mettre une limite
+//						right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
+//						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+//					}else{
+//						right_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+//						left_motor_set_speed(MOTOR_SPEED_LIMIT/2);
+//					}
+//				break;
+//
+//				 default:
+//					right_motor_set_speed(0);
+//					left_motor_set_speed(0);
+//
+//			}
         }else{
         	 if(fabs(get_angle()) >= ANGLE_FIN_ROTATION && tout_droit == 0){
 					if(angle>0){
@@ -157,7 +256,7 @@ static THD_FUNCTION(PiRegulator, arg) {
 				   right_motor_set_speed(MOTOR_SPEED_LIMIT);
 				   left_motor_set_speed( MOTOR_SPEED_LIMIT);
 
-					if(fabs(get_angle()) >= ANGLE_FIN_DROIT) tout_droit = FALSE;
+				   if(fabs(get_angle()) >= ANGLE_FIN_DROIT) tout_droit = FALSE;
 			   }else {
 					right_motor_set_speed(0);
 					left_motor_set_speed(0);

@@ -10,8 +10,8 @@
 
 
 void capteur_distance_start(void);
-uint8_t get_capteur_proche(void);
-unsigned int get_val_capteur_proche(void);
+uint8_t get_capteur_proche(uint8_t);
+unsigned int get_val_capteur_proche(uint8_t);
 
 
 #endif /* CAPTEUR_DISTANCE_H_ */

@@ -21,8 +21,10 @@
 
 uint8_t NB_CAPTEUR= 8;
 uint8_t VALEUR_REF = 0;
-uint8_t num_proche = 0;
-unsigned int valeur_capt_proche = 0;
+uint8_t num_proche[2]= {0};
+
+unsigned int valeur_capt_proche[2] = {0};
+
 
 static THD_WORKING_AREA(waCapteurDistance, 256);
 static THD_FUNCTION(CapteurDistance, arg) {
@@ -47,16 +49,18 @@ static THD_FUNCTION(CapteurDistance, arg) {
 //        chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[0]);
 //        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
 
-        num_proche = VALEUR_REF;
-        int marge_detection = 500; //échelle du capteur de 0 à 4000, 0 est quand le mur touche le capteur.
-        valeur_capt_proche = VALEUR_REF;
+        num_proche[0] = VALEUR_REF;
+        int marge_detection = 400; //échelle du capteur de 0 à 4000, 0 est quand le mur touche le capteur.
+        valeur_capt_proche[0] = VALEUR_REF;
 
 
 //        for(uint8_t i=0; i< sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++){
         for(uint8_t i=0; i< NB_CAPTEUR; i++){
-        	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) && (prox_values.delta[i]>=prox_values.delta[num_proche])){
-        		 num_proche = i;
-        		 valeur_capt_proche = prox_values.reflected[i];
+        	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) && (prox_values.delta[i]>=prox_values.delta[num_proche[0]])){
+        		num_proche[1] = num_proche[0];
+        		 num_proche[0] = i;
+        		 valeur_capt_proche[1] = valeur_capt_proche[0];
+        		 valeur_capt_proche[0] = prox_values.reflected[i];
 
 //        		 	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[i]);
 //        		 	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[i]);
@@ -101,12 +105,12 @@ void capteur_distance_start(void){
 	chThdCreateStatic(waCapteurDistance, sizeof(waCapteurDistance), NORMALPRIO, CapteurDistance, NULL);
 }
 
-uint8_t get_capteur_proche(void){
-	return num_proche;
+uint8_t get_capteur_proche(uint8_t rang){
+	return num_proche[rang];
 }
 
-unsigned int get_val_capteur_proche(void){
-	return valeur_capt_proche;
+unsigned int get_val_capteur_proche(uint8_t rang){
+	return valeur_capt_proche[rang];
 }
 
 
