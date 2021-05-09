@@ -14,6 +14,7 @@ CSRC += ./main.c \
 		./capteur_distance.c \
 		./controle_avec_leds.c \
 		./gyro_angles.c \
+		./conditions_fin.c \
 
 #Header folders to include
 INCDIR += 

@@ -15,6 +15,7 @@
 
 
 //nos includes ajouté
+#include <conditions_fin.h>
 #include <capteur_distance.h>
 #include <controle_avec_leds.h>
 #include <gyro_angles.h>
@@ -74,7 +75,7 @@ int main(void)
 //	//inits the motors
 	motors_init();
 
-	//stars the threads for the pi regulator and the processing of the image
+	conditions_fin_start();
 	pi_regulator_start();
 //	process_image_start();
 

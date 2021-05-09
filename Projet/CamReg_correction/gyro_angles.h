@@ -1,4 +1,4 @@
-#define FILTERSIZE 32
+#define FILTERSIZE 16
 
 
 
