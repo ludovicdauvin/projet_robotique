@@ -4,6 +4,7 @@
 
 
 int get_angle_inc(void);
+int get_angle_inc_x(void);
 int get_angle_dir(void);
 void gravite_start(void);
 

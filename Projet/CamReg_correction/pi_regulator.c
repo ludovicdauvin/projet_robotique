@@ -43,12 +43,12 @@ int16_t pi_regulator(int error){
     return (int16_t)speed;
 }
 
-int ANGLE_LIMITE = 11;//trouvée expérimentalement
+int ANGLE_LIMITE = 2;//trouvée expérimentalement
 int FACTOR_STRAIGHT = 400;
 int FACTOR_ROTATION = 200;
 int ANGLE_FIN_ROTATION = 5;
 int ANGLE_FIN_DROIT = 20;
-int LIMITE_INCLINAISON = 15;
+int LIMITE_INCLINAISON = 5;
 int SPEED_MIN = 150;
 
 
@@ -85,7 +85,7 @@ static THD_FUNCTION(PiRegulator, arg) {
         uint16_t valeur_proche = get_val_capteur_proche(LE_PLUS_PROCHE);
         enum capteurs_ir capteur_proche = get_capteur_proche(LE_PLUS_PROCHE);
 
-        if(get_fin() == FALSE || get_angle_inc() > LIMITE_INCLINAISON){
+        if((get_fin() == FALSE) && ((fabs(get_angle_inc()) > LIMITE_INCLINAISON)||(fabs(get_angle_inc_x()) > LIMITE_INCLINAISON))){
 
 			if((((capteur_proche == ir1 && valeur_proche!=0)||capteur_proche == ir2||capteur_proche == ir3) && angle > 0) || ((capteur_proche == ir6||capteur_proche == ir7||capteur_proche == ir8) && angle <= 0)){
 
@@ -185,13 +185,16 @@ static THD_FUNCTION(PiRegulator, arg) {
 //						right_motor_set_speed(0);
 //						left_motor_set_speed(0);
 //				   }
-				if(fabs(get_angle_dir()) >= ANGLE_FIN_DROIT) {
-					right_motor_set_speed(-pi_regulator(angle));
-					left_motor_set_speed(pi_regulator(angle));
-				}else if(get_angle_inc() > LIMITE_INCLINAISON){
-				   right_motor_set_speed(MOTOR_SPEED_LIMIT);
-				   left_motor_set_speed( MOTOR_SPEED_LIMIT);
-				}
+//				if(fabs(get_angle_dir()) >= ANGLE_FIN_DROIT) {
+//					right_motor_set_speed(-pi_regulator(angle));
+//					left_motor_set_speed(pi_regulator(angle));
+//				}else if(get_angle_inc() > LIMITE_INCLINAISON){
+//				   right_motor_set_speed(MOTOR_SPEED_LIMIT);
+//				   left_motor_set_speed( MOTOR_SPEED_LIMIT);
+//				}
+				int16_t vitesse_droit = MOTOR_SPEED_LIMIT-fabs(pi_regulator(angle));
+				right_motor_set_speed((vitesse_droit-pi_regulator(angle))/2);
+				left_motor_set_speed((vitesse_droit+pi_regulator(angle))/2);
 			}
         }else{
 			right_motor_set_speed(0);

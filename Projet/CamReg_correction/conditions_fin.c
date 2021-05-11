@@ -56,6 +56,7 @@ static THD_FUNCTION(ConditionsFin, arg) {
         }
 
         set_body_led(fin);
+
         chThdSleepUntilWindowed(time, time + MS2ST(10));
     }
 }
