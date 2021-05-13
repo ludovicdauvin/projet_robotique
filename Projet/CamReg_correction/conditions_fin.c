@@ -20,9 +20,9 @@
 #include <capteur_distance.h>
 #include <leds.h>
 
-uint8_t MARGE_ANGLE_FIN = 7;// pas grave si c'est large, grosse impréssision si on tient le plateaux à la main
-uint8_t ANGLE_DROIT = 90;
+uint8_t MARGE_ANGLE_FIN = 5;// pas grave si c'est large, grosse impréssision si on tient le plateaux à la main
 bool fin = FALSE;
+uint8_t ANGLE_DROIT = 90;
 
 
 enum capteurs_ir {ir1, ir2,ir3,ir4,ir5,ir6,ir7,ir8};
@@ -45,14 +45,18 @@ static THD_FUNCTION(ConditionsFin, arg) {
         fin= FALSE;
 
 
-        if(((capteur_proche == ir1 && get_val_capteur_proche(LE_PLUS_PROCHE) !=0)|| (capteur_proche == ir8 /*&& capteur_proche_2 == ir1*/))&& fabs(angle)<= MARGE_ANGLE_FIN) {
+        if(((capteur_proche == ir1 && get_val_capteur_proche(LE_PLUS_PROCHE) !=0) || (capteur_proche == ir8 /*&& capteur_proche_2 == ir1*/)) && fabs(angle)<= MARGE_ANGLE_FIN) {
         	fin = TRUE; // fin si le robot arrive droit sur un mur horizontale
         }
         if(capteur_proche == ir3 && fabs(angle- ANGLE_DROIT)<=MARGE_ANGLE_FIN){
         	fin = TRUE; // fin si le robot arrive en longeant un mur à sa droite
         }
-        if(capteur_proche == ir6 && fabs(angle+ ANGLE_DROIT)<=MARGE_ANGLE_FIN){
+        if((capteur_proche == ir6 || capteur_proche_2 == ir6) && fabs(angle + ANGLE_DROIT)<=MARGE_ANGLE_FIN){
         	fin = TRUE; // fin si le robot arrive en longeant un mur à sa droite
+        }
+        if (((capteur_proche == ir2 && capteur_proche_2 == ir7) && fabs(angle)<=MARGE_ANGLE_FIN)||
+        		((capteur_proche == ir7 && capteur_proche_2 == ir2) && fabs(angle)<=MARGE_ANGLE_FIN)){
+        	fin = TRUE; // fin si le robot arrive dans un angle
         }
 
         set_body_led(fin);

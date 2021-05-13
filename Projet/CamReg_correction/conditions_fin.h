@@ -9,6 +9,8 @@
 #define CONDITIONS_FIN_H_
 
 
+
+
 void conditions_fin_start(void);
 bool get_fin(void);
 

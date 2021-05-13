@@ -20,7 +20,7 @@ extern "C" {
 
 #define ERROR_THRESHOLD			2 // en degré
 #define KP						20.0f
-#define KI 						1.5f	//must not be zero
+#define KI 						0.3f	//must not be zero
 #define MAX_SUM_ERROR 			(MOTOR_SPEED_LIMIT/KI)
 
 
