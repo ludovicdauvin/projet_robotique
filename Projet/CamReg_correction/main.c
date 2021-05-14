@@ -22,6 +22,7 @@
 #include <leds.h>
 #include <sensors/proximity.h>
 #include <sensors/imu.h>
+#include <spi_comm.h>
 
 
 messagebus_t bus;
@@ -62,9 +63,11 @@ int main(void)
     //start the USB communication
     usb_start();
 
+
     //starts sensors
     proximity_start();
     imu_start();
+    spi_comm_start();
 
 
 

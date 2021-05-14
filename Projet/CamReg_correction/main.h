@@ -11,12 +11,6 @@ extern "C" {
 
 
 //constants for the differents parts of the project
-#define IMAGE_BUFFER_SIZE		640
-#define WIDTH_SLOPE				5
-#define MIN_LINE_WIDTH			40
-#define ROTATION_THRESHOLD		10
-#define ROTATION_COEFF			2 
-#define PXTOCM					1570.0f //experimental value
 
 #define ERROR_THRESHOLD			2 // en degré
 #define KP						20.0f
@@ -26,6 +20,10 @@ extern "C" {
 
 #define LE_PLUS_PROCHE          0
 #define LE_2ND_PLUS_PROCHE 		1
+
+#define ANGLE_LIMITE  2//trouvée expérimentalement
+#define LIMITE_INCLINAISON  5
+#define SPEED_MIN  150
 
 /** Robot wide IPC bus. */
 extern messagebus_t bus;

@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -37,14 +36,9 @@ static THD_FUNCTION(imu_reader_thd, arg) {
 
      while (1) {
     	time = chVTGetSystemTime();
-    	int angle_dir_test =0;
-    	int angle_inc_test =0;
-    	int angle_inc_x_test =0;
 
 		messagebus_topic_wait(imu_topic, &imu_values, sizeof(imu_values));
-//		int16_t x = get_acc_filtered(X_AXIS, FILTERSIZE);
-//		int16_t y = get_acc_filtered(Y_AXIS, FILTERSIZE);
-//		int16_t z = get_acc_filtered(Z_AXIS, FILTERSIZE);
+
 		int16_t x = get_acc(X_AXIS);
 		int16_t y = get_acc(Y_AXIS);
 		int16_t z = get_acc(Z_AXIS);
@@ -76,9 +70,6 @@ static THD_FUNCTION(imu_reader_thd, arg) {
 		if(angle_inc_x > M_PI*CONVERSION_RAD_DEG){
 					angle_inc_x = -2 * M_PI*CONVERSION_RAD_DEG + angle_inc_x;
 		}
-		angle_dir_test = angle_dir;
-		angle_inc_test = angle_inc;
-		angle_inc_x_test = angle_inc_x;
 
 		chThdSleepUntilWindowed(time, time + MS2ST(50));
 	}

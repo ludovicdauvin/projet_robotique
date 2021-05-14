@@ -24,7 +24,7 @@ uint8_t VALEUR_REF = 0;
 uint8_t num_proche[2]= {0};
 
 unsigned int valeur_capt_proche[2] = {0};
-
+unsigned int delta_capt_proche = 0;
 
 static THD_WORKING_AREA(waCapteurDistance, 256);
 static THD_FUNCTION(CapteurDistance, arg) {
@@ -44,57 +44,26 @@ static THD_FUNCTION(CapteurDistance, arg) {
     while(1){
         time = chVTGetSystemTime();
         messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
-//        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[0]);
-//        chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[0]);
-//        chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[0]);
-//        chprintf((BaseSequentialStream *)&SDU1, "\r\n");
+
 
         num_proche[0] = VALEUR_REF;
         int marge_detection = 400; //échelle du capteur de 0 à 4000, 0 est quand le mur touche le capteur.
         valeur_capt_proche[0] = VALEUR_REF;
 
 
-//        for(uint8_t i=0; i< sizeof(prox_values.ambient)/sizeof(prox_values.ambient[0]); i++){
+
         for(uint8_t i=0; i< NB_CAPTEUR; i++){
         	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) && (prox_values.delta[i]>=prox_values.delta[num_proche[0]])){
         		num_proche[1] = num_proche[0];
         		 num_proche[0] = i;
         		 valeur_capt_proche[1] = valeur_capt_proche[0];
         		 valeur_capt_proche[0] = prox_values.reflected[i];
+        		 delta_capt_proche = prox_values.delta[i];
 
-//        		 	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.ambient[i]);
-//        		 	chprintf((BaseSequentialStream *)&SDU1, "%4d,", prox_values.reflected[i]);
-//        		 	chprintf((BaseSequentialStream *)&SDU1, "%4d", prox_values.delta[i]);
-//        		 	chprintf((BaseSequentialStream *)&SDU1, "\r\n");
 
-        	 	 }//else{
-//        		 valeur_capt_proche = 0;
-//        		 //num_proche = 8;// attention le 8 est pour dire aucun, à changer plus tard
-//        		 clear_leds();
-//        	 }
+        	 	 }
 
         }
-//        if (num_proche==0 && valeur_capt_proche != 0){
-//        	set_led(LED1,TRUE); // value (0=off 1=on higher=inverse)
-//       	}else if(num_proche==1){
-//            set_led(LED3,TRUE);
-//            set_led(LED1,TRUE);// value (0=off 1=on higher=inverse)
-//        }else if(num_proche==2){
-//            set_led(LED3,TRUE);// value (0=off 1=on higher=inverse)
-//        }else if(num_proche==3){
-//            set_led(LED5,TRUE);
-//            set_led(LED3,TRUE);// value (0=off 1=on higher=inverse)
-//        }else if(num_proche==4){
-//            set_led(LED5,TRUE);
-//            set_led(LED7,TRUE);
-//        }else if(num_proche==5){
-//            set_led(LED7,TRUE);
-//        }else if(num_proche==6){
-//            set_led(LED1,TRUE);
-//            set_led(LED7,TRUE);
-//        }else if(num_proche==7){
-//            set_led(LED1,TRUE);
-//        }
 
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));
@@ -111,6 +80,10 @@ uint8_t get_capteur_proche(uint8_t rang){
 
 unsigned int get_val_capteur_proche(uint8_t rang){
 	return valeur_capt_proche[rang];
+}
+
+unsigned int get_delta_capteur_proche(void){
+	return delta_capt_proche;
 }
 
 
