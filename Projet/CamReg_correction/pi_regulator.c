@@ -81,7 +81,7 @@ static THD_FUNCTION(PiRegulator, arg) {
 					(((capteur_proche == ir6)||capteur_proche == ir7||capteur_proche == ir8) && angle <= 0 && angle > -90)) ||
 					(capteur_proche == ir4 || capteur_proche == ir5)){ // condition qui vérifie si il y a un obstacle devant la direction où le robot doit aller
 
-//				if ((capteur_proche == ir1||capteur_proche == ir2||capteur_proche == ir8||capteur_proche == ir7) && valeur_proche > 3000){ // marge mise pour s'assurer que le capteur 3 ou 6 détecte le mur pendant la rotation
+//				if ((capteur_proche == ir1||capteur_proche == ir2||capteur_proche == ir8||capteur_proche == ir7) && valeur_proche > 3400){ // marge mise pour s'assurer que le capteur 3 ou 6 détecte le mur pendant la rotation
 //					capteur_proche = ir1;
 //					valeur_proche = 0;
 //					right_motor_set_speed(MOTOR_SPEED_LIMIT/4);
@@ -167,16 +167,15 @@ static THD_FUNCTION(PiRegulator, arg) {
 //
 //				}
 
-
 				switch (capteur_proche){// évitement d'obstacle inspiré de celui présent dans le main du src
 					case ir1: case ir2:
-						right_motor_set_speed(MOTOR_SPEED_LIMIT/2+get_delta_capteur_proche());
-						left_motor_set_speed(MOTOR_SPEED_LIMIT/2-get_delta_capteur_proche());
+						right_motor_set_speed(MOTOR_SPEED_LIMIT/2 + get_delta_capteur_proche());
+						left_motor_set_speed(MOTOR_SPEED_LIMIT/2 - get_delta_capteur_proche());
 					break;
 
 					case ir7: case ir8:
-						right_motor_set_speed(MOTOR_SPEED_LIMIT/2-get_delta_capteur_proche());
-						left_motor_set_speed(MOTOR_SPEED_LIMIT/2+get_delta_capteur_proche());
+						right_motor_set_speed(MOTOR_SPEED_LIMIT/2- get_delta_capteur_proche());
+						left_motor_set_speed(MOTOR_SPEED_LIMIT/2+ get_delta_capteur_proche());
 					break;
 
 					case ir4: case ir5:
@@ -185,14 +184,14 @@ static THD_FUNCTION(PiRegulator, arg) {
 					break;
 
 					case ir3:
-						right_motor_set_speed((MOTOR_SPEED_LIMIT-(valeur_proche-2800))/2);
-						left_motor_set_speed((MOTOR_SPEED_LIMIT+(valeur_proche-2800))/2);
+						right_motor_set_speed(MOTOR_SPEED_LIMIT/2-(valeur_proche-3000));
+						left_motor_set_speed(MOTOR_SPEED_LIMIT/2+(valeur_proche-3000));
 
 					break;
 
 					case ir6:
-						right_motor_set_speed((MOTOR_SPEED_LIMIT+(valeur_proche-2800))/2);
-						left_motor_set_speed((MOTOR_SPEED_LIMIT-(valeur_proche-2800))/2);
+						right_motor_set_speed(MOTOR_SPEED_LIMIT/2+(valeur_proche-3000));
+						left_motor_set_speed(MOTOR_SPEED_LIMIT/2-(valeur_proche-3000));
 					break;
 
 					default:
