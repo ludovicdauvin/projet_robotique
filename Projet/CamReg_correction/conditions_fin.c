@@ -5,11 +5,11 @@
  *      Author: Ludovic
  */
 
-#include "ch.h"
+//#include "ch.h"
 #include "hal.h"
 #include <math.h>
 #include <usbcfg.h>
-#include <chprintf.h>
+//#include <chprintf.h>
 #include <stdbool.h>
 
 
@@ -22,11 +22,9 @@
 
 
 static bool fin = FALSE;
-uint8_t ANGLE_DROIT = 90;
-uint8_t MARGE_SORTIE_FIN = 20;
 
 
-enum capteurs_ir {ir1, ir2,ir3,ir4,ir5,ir6,ir7,ir8};
+enum CAPTEURS_IR {ir1, ir2,ir3,ir4,ir5,ir6,ir7,ir8};
 
 static THD_WORKING_AREA(waConditionsFin, 256);
 static THD_FUNCTION(ConditionsFin, arg) {
@@ -40,12 +38,12 @@ static THD_FUNCTION(ConditionsFin, arg) {
         time = chVTGetSystemTime();
 
         int8_t angle = get_angle_dir();
-        enum capteurs_ir capteur_proche = get_capteur_proche(LE_PLUS_PROCHE);
-        enum capteurs_ir capteur_proche_2 = get_capteur_proche(LE_2ND_PLUS_PROCHE);
+        enum CAPTEURS_IR capteur_proche = get_capteur_proche(LE_PLUS_PROCHE);
+        enum CAPTEURS_IR capteur_proche_2 = get_capteur_proche(LE_2ND_PLUS_PROCHE);
 
         if(fin == TRUE){
         	if(get_val_capteur_proche(LE_PLUS_PROCHE) !=0){
-				if(((capteur_proche == ir1 /*&& get_val_capteur_proche(LE_PLUS_PROCHE) !=0*/) || (capteur_proche == ir8 /*&& capteur_proche_2 == ir1*/)) && fabs(angle)>= MARGE_SORTIE_FIN) {
+				if(((capteur_proche == ir1 /*&& get_val_capteur_proche(LE_PLUS_PROCHE) !=0*/) || (capteur_proche == ir8)) && fabs(angle)>= MARGE_SORTIE_FIN) {
 					fin = FALSE; // fin si le robot arrive droit sur un mur horizontale
 				}else if((capteur_proche == ir3 ||capteur_proche_2 == ir3) && fabs(angle- ANGLE_DROIT)>=MARGE_SORTIE_FIN){
 					fin = FALSE; // fin si le robot arrive en longeant un mur à sa droite
@@ -58,7 +56,7 @@ static THD_FUNCTION(ConditionsFin, arg) {
         	}else fin=FALSE;
 
         }else{
-			if(((capteur_proche == ir1 && get_val_capteur_proche(LE_PLUS_PROCHE) !=0) || (capteur_proche == ir8 /*&& capteur_proche_2 == ir1*/)) && fabs(angle)<= MARGE_ANGLE_FIN) {
+			if(((capteur_proche == ir1 && get_val_capteur_proche(LE_PLUS_PROCHE) !=0) || (capteur_proche == ir8)) && fabs(angle)<= MARGE_ANGLE_FIN) {
 				fin = TRUE; // fin si le robot arrive droit sur un mur horizontale
 			}
 			if(capteur_proche == ir3 && fabs(angle- ANGLE_DROIT)<=MARGE_ANGLE_FIN){

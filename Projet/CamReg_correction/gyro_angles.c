@@ -1,11 +1,17 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+/*
+ * gyro_angle.c
+ *
+ *  Last modification on: 16 May. 2021
+ *      Author: Ludovic
+ */
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 #include <math.h>
 #include <stdbool.h>
-#include "ch.h"
+//#include "ch.h"
 #include "hal.h"
-#include <chprintf.h>
+//#include <chprintf.h>
 #include <usbcfg.h>
 #include <sensors/imu.h>
 #include <gyro_angles.h>
@@ -13,7 +19,7 @@
 
 float CONVERSION_RAD_DEG = 180/M_PI;
 int16_t CORRECTION_ANGLE_INC = 180;// sert à mettre 0 quand le robot est horizontal
-uint16_t threshold = 1200;
+uint16_t THRESHOLD_AXE = 1200;
 int angle_dir=0;
 int angle_inc=0;
 int angle_inc_x=0;
@@ -21,8 +27,8 @@ int angle_inc_x=0;
 
 
 
-static THD_WORKING_AREA(imu_reader_thd_wa, 512);
-static THD_FUNCTION(imu_reader_thd, arg) {
+static THD_WORKING_AREA(waImuReader, 512);
+static THD_FUNCTION(ImuReader, arg) {
 
      chRegSetThreadName(__FUNCTION__);
      (void) arg;
@@ -43,19 +49,19 @@ static THD_FUNCTION(imu_reader_thd, arg) {
 		int16_t y = get_acc(Y_AXIS);
 		int16_t z = get_acc(Z_AXIS);
 
-		if(fabs(y) > threshold || fabs(z+ get_acc_offset(Z_AXIS)) > threshold){
+		if(fabs(y) > THRESHOLD_AXE || fabs(z+ get_acc_offset(Z_AXIS)) > THRESHOLD_AXE){ // code inspiré du tp3 show gravity
 		angle_inc = -atan2(y,z)*CONVERSION_RAD_DEG - CORRECTION_ANGLE_INC;
 		}else{
 			angle_inc = 0;
 		}
 
-		if(fabs(x) > threshold || fabs(z+ get_acc_offset(Z_AXIS)) > threshold){
+		if(fabs(x) > THRESHOLD_AXE || fabs(z+ get_acc_offset(Z_AXIS)) > THRESHOLD_AXE){
 				angle_inc_x = -atan2(x,z)*CONVERSION_RAD_DEG + CORRECTION_ANGLE_INC;
 				}else{
 					angle_inc_x = 0;
 				}
 
-		if(fabs(x) > threshold || fabs(y) > threshold){
+		if(fabs(x) > THRESHOLD_AXE || fabs(y) > THRESHOLD_AXE){
 			angle_dir = atan2(x, y)*CONVERSION_RAD_DEG;
 		}else{
 			angle_dir = 0;
@@ -76,7 +82,7 @@ static THD_FUNCTION(imu_reader_thd, arg) {
 }
 
 void gravite_start(void){
-	chThdCreateStatic(imu_reader_thd_wa, sizeof(imu_reader_thd_wa), NORMALPRIO, imu_reader_thd, NULL);
+	chThdCreateStatic(waImuReader, sizeof(waImuReader), NORMALPRIO, ImuReader, NULL);
 }
 int get_angle_inc(void){
 	 return angle_inc;

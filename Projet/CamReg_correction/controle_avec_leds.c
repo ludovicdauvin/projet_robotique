@@ -4,15 +4,15 @@
  *  Created on: 27 avr. 2021
  *      Author: Ludovic
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 #include <math.h>
 
-#include "ch.h"
+//#include "ch.h"
 #include "hal.h"
-#include <chprintf.h>
-#include <usbcfg.h>
+//#include <chprintf.h>
+//#include <usbcfg.h>
 
 #include <main.h>
 #include <capteur_distance.h>

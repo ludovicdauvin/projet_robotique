@@ -10,6 +10,4 @@
 
 void controle_distance_leds_start(void);
 
-
-
 #endif /* CONTROLE_AVEC__LEDS_H_ */

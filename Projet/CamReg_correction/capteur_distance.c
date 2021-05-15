@@ -4,19 +4,19 @@
  *  Created on: 20 avr. 2021
  *      Author: Ludovic
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 #include <math.h>
 
-#include "ch.h"
+//#include "ch.h"
 #include "hal.h"
-#include <chprintf.h>
+//#include <chprintf.h>
 #include <usbcfg.h>
 
 #include <main.h>
 #include <capteur_distance.h>
-#include <leds.h>
+//#include <leds.h>
 #include <sensors/proximity.h>
 
 uint8_t NB_CAPTEUR= 8;
@@ -59,8 +59,6 @@ static THD_FUNCTION(CapteurDistance, arg) {
         		 valeur_capt_proche[1] = valeur_capt_proche[0];
         		 valeur_capt_proche[0] = prox_values.reflected[i];
         		 delta_capt_proche = prox_values.delta[i];
-
-
         	 	 }
 
         }

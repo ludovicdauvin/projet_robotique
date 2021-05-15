@@ -21,10 +21,13 @@ extern "C" {
 #define LE_PLUS_PROCHE          0
 #define LE_2ND_PLUS_PROCHE 		1
 
-#define ANGLE_LIMITE 			2//trouvée expérimentalement
-#define LIMITE_INCLINAISON  	5
+#define ANGLE_LIMITE 			2//angle en degrés, trouvée expérimentalement
+#define LIMITE_INCLINAISON  	5// angle en degrés
 #define SPEED_MIN  				150
 #define MARGE_ANGLE_FIN  		5// pas grave si c'est large, grosse impréssision si on tient le plateaux à la main
+#define DISTANCE_MUR			3000 // équivaut à 1 cm
+#define ANGLE_DROIT  			90 // en degrés
+#define MARGE_SORTIE_FIN 		20 // angle en degrés
 
 /** Robot wide IPC bus. */
 extern messagebus_t bus;
