@@ -47,7 +47,7 @@ static THD_FUNCTION(ConditionsFin, arg) {
         	if(get_val_capteur_proche(LE_PLUS_PROCHE) !=0){
 				if(((capteur_proche == ir1 /*&& get_val_capteur_proche(LE_PLUS_PROCHE) !=0*/) || (capteur_proche == ir8 /*&& capteur_proche_2 == ir1*/)) && fabs(angle)>= MARGE_SORTIE_FIN) {
 					fin = FALSE; // fin si le robot arrive droit sur un mur horizontale
-				}else if((capteur_proche == ir3 ||capteur_proche_2 == ir3) && fabs(angle- ANGLE_DROIT)<=MARGE_SORTIE_FIN){
+				}else if((capteur_proche == ir3 ||capteur_proche_2 == ir3) && fabs(angle- ANGLE_DROIT)>=MARGE_SORTIE_FIN){
 					fin = FALSE; // fin si le robot arrive en longeant un mur à sa droite
 				}else if((capteur_proche == ir6 || capteur_proche_2 == ir6) && fabs(angle + ANGLE_DROIT)>=MARGE_SORTIE_FIN){
 					fin = FALSE; // fin si le robot arrive en longeant un mur à sa gauche
