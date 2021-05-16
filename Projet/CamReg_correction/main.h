@@ -24,7 +24,7 @@ extern "C" {
 #define ANGLE_LIMITE 			2//angle en degrés, trouvée expérimentalement
 #define LIMITE_INCLINAISON  	5// angle en degrés
 #define SPEED_MIN  				150
-#define MARGE_ANGLE_FIN  		5// pas grave si c'est large, grosse impréssision si on tient le plateaux à la main
+#define MARGE_ANGLE_FIN  		5// pas grave si c'est large, grosse imprécision si on tient le plateau à la main
 #define DISTANCE_MUR			3000 // équivaut à 1 cm
 #define ANGLE_DROIT  			90 // en degrés
 #define MARGE_SORTIE_FIN 		20 // angle en degrés

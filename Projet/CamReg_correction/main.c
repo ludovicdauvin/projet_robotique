@@ -9,9 +9,7 @@
 #include <usbcfg.h>
 #include <main.h>
 #include <motors.h>
-
-
-#include <pi_regulator.h>
+#include <spi_comm.h>
 
 
 //nos includes ajouté
@@ -21,7 +19,8 @@
 #include <gyro_angles.h>
 #include <sensors/proximity.h>
 #include <sensors/imu.h>
-#include <spi_comm.h>
+
+#include <pi_regulator.h>
 
 
 messagebus_t bus;
@@ -47,18 +46,13 @@ int main(void)
     proximity_start();
     imu_start();
     spi_comm_start();
-
-
-
-
-
 	motors_init();
 
 	conditions_fin_start();
 	pi_regulator_start();
 
 
-    //capteur distance
+    //capteurs
     capteur_distance_start();
     controle_distance_leds_start();
     gravite_start();

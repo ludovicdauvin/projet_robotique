@@ -47,7 +47,7 @@ static THD_FUNCTION(CapteurDistance, arg) {
         for(uint8_t i=0; i< NB_CAPTEUR; i++){
         	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) &&
         			 (prox_values.delta[i]>=prox_values.delta[num_proche[LE_PLUS_PROCHE]])){
-        		num_proche[LE_2ND_PLUS_PROCHE] = num_proche[LE_PLUS_PROCHE];
+        		 num_proche[LE_2ND_PLUS_PROCHE] = num_proche[LE_PLUS_PROCHE];
         		 num_proche[LE_PLUS_PROCHE] = i;
         		 valeur_capt_proche[LE_2ND_PLUS_PROCHE] = valeur_capt_proche[LE_PLUS_PROCHE];
         		 valeur_capt_proche[LE_PLUS_PROCHE] = prox_values.reflected[i];
