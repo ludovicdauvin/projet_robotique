@@ -1,10 +1,7 @@
-//#include "ch.h"
+#include "ch.h"
 #include "hal.h"
 #include <math.h>
-//#include <usbcfg.h>
-//#include <chprintf.h>
 #include <stdbool.h>
-
 
 #include <main.h>
 #include <conditions_fin.h>
@@ -12,7 +9,6 @@
 #include <pi_regulator.h>
 #include <gyro_angles.h>
 #include <capteur_distance.h>
-//#include <leds.h>
 
 
 enum CAPTEURS_IR {ir1, ir2,ir3,ir4,ir5,ir6,ir7,ir8};
@@ -64,10 +60,10 @@ static THD_FUNCTION(PiRegulator, arg) {
 
 
         if((fin == FALSE) && ((fabs(get_angle_inc()) > LIMITE_INCLINAISON)||(fabs(get_angle_inc_x()) > LIMITE_INCLINAISON))){
-
-			if(((((capteur_proche == ir1 && valeur_proche!=0)||capteur_proche == ir2||(capteur_proche == ir3 )) && angle > 0 && angle < ANGLE_DROIT) ||
-					(((capteur_proche == ir6)||capteur_proche == ir7||capteur_proche == ir8) && angle <= 0 && angle > -ANGLE_DROIT)) ||
-					(capteur_proche == ir4 || capteur_proche == ir5)){ // condition qui vérifie si il y a un obstacle devant la direction où le robot doit aller
+        	// condition qui vérifie si il y a un obstacle devant la direction où le robot doit aller
+			if(((((capteur_proche == ir1 && valeur_proche!=0)||capteur_proche == ir2||(capteur_proche == ir3 ))	&& angle > 0 && angle < ANGLE_DROIT)
+					|| (((capteur_proche == ir6)||capteur_proche == ir7||capteur_proche == ir8) && angle <= 0 && angle > -ANGLE_DROIT)) ||
+					(capteur_proche == ir4 || capteur_proche == ir5)){
 
 				switch (capteur_proche){// évitement d'obstacle inspiré de celui présent dans le main du src
 					case ir1: case ir2:
@@ -88,7 +84,6 @@ static THD_FUNCTION(PiRegulator, arg) {
 					case ir3:
 						right_motor_set_speed(MOTOR_SPEED_LIMIT/2-(valeur_proche-DISTANCE_MUR));
 						left_motor_set_speed(MOTOR_SPEED_LIMIT/2+(valeur_proche-DISTANCE_MUR));
-
 					break;
 
 					case ir6:
@@ -107,8 +102,10 @@ static THD_FUNCTION(PiRegulator, arg) {
 
 			}
         }else{
+
 			right_motor_set_speed(0);
 			left_motor_set_speed(0);
+
         }
         //100Hz
         chThdSleepUntilWindowed(time, time + MS2ST(10));

@@ -4,19 +4,11 @@
  *  Created on: 20 avr. 2021
  *      Author: Ludovic
  */
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <string.h>
-#include <math.h>
 
-//#include "ch.h"
+#include "ch.h"
 #include "hal.h"
-//#include <chprintf.h>
-#include <usbcfg.h>
-
 #include <main.h>
 #include <capteur_distance.h>
-//#include <leds.h>
 #include <sensors/proximity.h>
 
 uint8_t NB_CAPTEUR= 8;
@@ -43,21 +35,22 @@ static THD_FUNCTION(CapteurDistance, arg) {
 
     while(1){
         time = chVTGetSystemTime();
+
         messagebus_topic_wait(prox_topic, &prox_values, sizeof(prox_values));
 
-
-        num_proche[0] = VALEUR_REF;
+        num_proche[LE_PLUS_PROCHE] = VALEUR_REF;
+        valeur_capt_proche[LE_PLUS_PROCHE] = VALEUR_REF;
         int marge_detection = 400; //échelle du capteur de 0 à 4000, 0 est quand le mur touche le capteur.
-        valeur_capt_proche[0] = VALEUR_REF;
 
 
 
         for(uint8_t i=0; i< NB_CAPTEUR; i++){
-        	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) && (prox_values.delta[i]>=prox_values.delta[num_proche[0]])){
-        		num_proche[1] = num_proche[0];
-        		 num_proche[0] = i;
-        		 valeur_capt_proche[1] = valeur_capt_proche[0];
-        		 valeur_capt_proche[0] = prox_values.reflected[i];
+        	 if((prox_values.reflected[i] + marge_detection < prox_values.ambient[i]) &&
+        			 (prox_values.delta[i]>=prox_values.delta[num_proche[LE_PLUS_PROCHE]])){
+        		num_proche[LE_2ND_PLUS_PROCHE] = num_proche[LE_PLUS_PROCHE];
+        		 num_proche[LE_PLUS_PROCHE] = i;
+        		 valeur_capt_proche[LE_2ND_PLUS_PROCHE] = valeur_capt_proche[LE_PLUS_PROCHE];
+        		 valeur_capt_proche[LE_PLUS_PROCHE] = prox_values.reflected[i];
         		 delta_capt_proche = prox_values.delta[i];
         	 	 }
 
